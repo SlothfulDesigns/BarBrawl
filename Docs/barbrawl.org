@@ -1,0 +1,54 @@
+Barbrawl
+
+* Yleistä
+** Git repo
+** Visuaalinen ilme
+** 
+
+* MVP
+  Tavoitteena lähinnä ladata skene, pelaaja ja hakata/heitellä esineitä pelaajalla
+  Elikkäs perusmekaniikat ja fysiikat yhdellä pelaajalla
+
+** Core
+*** TODO Kenttien lataus
+*** TODO Pelaaja
+*** TODO Dummyhahmo kakkospelaajaks
+   
+** Pelimekaniikat
+*** TODO liikkuminen
+*** TODO lyönti
+*** TODO grab
+
+** Assetit
+*** TODO Hahmo & skeletorointi
+*** TODO Ympäristöt (seinät, lattiat yms)
+*** TODO "Sisustus"
+   
+
+* V1
+** Core
+*** Multiplayer eli pelaajat 2, 3 ja 4
+*** Voittohommat
+
+** Pelimekaniikat
+*** Powerupit, esim gräbättyjen pullojen juominen
+
+** Assetit
+*** Hahmoanimaatiot
+*** Lisää assetteja ja ympäristöjä
+
+   
+* Future
+** Core
+*** NPC:t
+*** Skenaario
+*** Achievementit
+
+** Pelimekaniikat
+*** gräbättyjen esineiden paino ja vaikutus ragdolliin
+    liian painavien esineiden raahailu perässä esim jos käsien
+    kantokyky ei riitä
+*** punchin yms sijasta ragdoll käsien ohjailu antamalla niille forcea
+
+** Assetit
+*** ympäristöt omilla kikoillaan, esim keinuva laivabaari
