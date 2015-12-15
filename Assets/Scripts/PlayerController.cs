@@ -29,7 +29,6 @@ public class PlayerController : MonoBehaviour {
     //...and physics and such here
     void FixedUpdate()
     {
-
         grounded = IsGrounded();
         Debug.Log(IsGrounded());
 
@@ -47,7 +46,7 @@ public class PlayerController : MonoBehaviour {
         Collider collider = GetComponent<Collider>();
         float distance = collider.bounds.extents.y;
 
-        return Physics.Raycast(transform.position, -Vector3.up, distance + 0.1f);
+        return Physics.Raycast(transform.position, -Vector3.up, distance + 0.01f);
     }
 
     void HandleMovement()
