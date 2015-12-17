@@ -7,6 +7,10 @@ public class PlayerController : MonoBehaviour {
 	public float speed, jumpspeed, punchForce;
     private bool grounded;
 
+    AudioClip punchAudio;
+    AudioClip footstepsAudio;
+    AudioSource audioSource;
+
 	private enum Arm
 	{
 		Left = 0,
@@ -16,8 +20,10 @@ public class PlayerController : MonoBehaviour {
 	// Use this for initialization
 	void Start()
 	{
-
-	}
+        audioSource = GetComponent<AudioSource>();
+        punchAudio = Resources.Load<AudioClip>("punch_heavy_stereo");
+        footstepsAudio = Resources.Load<AudioClip>("shitty_footsteps");
+    }
 	
     //update stuff that shouldn't be synced to fps, like controls, here...
 	void Update()
@@ -66,6 +72,9 @@ public class PlayerController : MonoBehaviour {
         Vector3 movement = new Vector3(inputHorizontal, 0.0f, inputVertical);
 
         rigidbody.velocity += movement;
+
+        if (!audioSource.isPlaying && movement != Vector3.zero)
+            audioSource.PlayOneShot(footstepsAudio);
     }
 
     void HandleActions()
@@ -103,11 +112,10 @@ public class PlayerController : MonoBehaviour {
 
         if(target != null)
         {
-		//add force to fist, towards the targeted object
-        target.velocity += direction.normalized * punchForce;
-
-		//profit!
-        Debug.Log(string.Format("{0} arm punch!", arm));
+            //add force to fist, towards the targeted object
+            target.velocity += direction.normalized * punchForce;
+            audioSource.PlayOneShot(punchAudio);
+            Debug.Log(string.Format("{0} arm punch!", arm));
         }
 	}
 
