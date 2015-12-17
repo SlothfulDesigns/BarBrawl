@@ -124,6 +124,7 @@ public class PlayerController : MonoBehaviour {
         Rigidbody target = null;
         var bumper = transform.Find("radarlol").GetComponent<SphereCollider>();
         Collider[] collider = Physics.OverlapSphere(bumper.transform.position, bumper.radius);
+
         foreach(var collision in collider)
         {
             //ignore self
@@ -131,7 +132,7 @@ public class PlayerController : MonoBehaviour {
 
             //ignore non-gravitational objects, ie. map and static stuff
             var rigidbody = collision.attachedRigidbody;
-            if(rigidbody != null && rigidbody.useGravity)
+            if(rigidbody != null && rigidbody.useGravity && rigidbody.name != this.name)
             {
                 target = collision.attachedRigidbody;
             }
