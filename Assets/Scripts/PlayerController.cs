@@ -4,8 +4,9 @@ using System.Collections;
 public class PlayerController : MonoBehaviour {
 
     //player positions
-	public float speed, jumpspeed, punchForce;
+	public float speed, jumpspeed, punchForce, throwForce;
     private bool grounded;
+    private GameObject grabbedObject;
 
     AudioClip punchAudio;
     AudioClip footstepsAudio;
@@ -73,6 +74,11 @@ public class PlayerController : MonoBehaviour {
 
         rigidbody.velocity += movement;
 
+        if(grabbedObject != null)
+        {
+            grabbedObject.transform.position = transform.position + transform.forward;
+        }
+
         if (!audioSource.isPlaying && movement != Vector3.zero)
             audioSource.PlayOneShot(footstepsAudio);
     }
@@ -87,20 +93,41 @@ public class PlayerController : MonoBehaviour {
             Debug.Log("Jump!");
         }
 
-        if (Input.GetButtonDown("PunchLeft")) Punch(Arm.Left);
-        if (Input.GetButtonDown("PunchRight")) Punch(Arm.Right);
+        if (Input.GetButtonDown("Punch")) Punch();
+        if (Input.GetButtonDown("Grab")) Grab();
+        if (Input.GetButtonDown("Throw")) Throw();
 
+    }
+
+    void Throw()
+    {
+        if(grabbedObject != null)
+        {
+            Debug.Log("Throw!");
+            grabbedObject.GetComponent<Rigidbody>().velocity += (transform.forward + (transform.up * 1.5f)) * throwForce;
+            grabbedObject = null;
+        }
     }
 
 	void Grab()
 	{
-		//get direction the player is facing
-		//get the closest player/item/thing in that direction
-		//grab it!
-		//proft
+        //get the closest player/item/thing
+        GameObject target = GetNearestTarget();
+        if (grabbedObject == null)
+        {
+            Debug.Log("Grab!");
+            //grab it!
+            grabbedObject = target;
+        }
+        else
+        {
+            Debug.Log("Drop!");
+            //let go of the object
+            grabbedObject = null;
+        }
 	}
 
-	void Punch(Arm arm)
+	void Punch()
 	{
 
 		//get the fist subcomponent of the selected arm
@@ -108,20 +135,20 @@ public class PlayerController : MonoBehaviour {
         var direction = transform.forward;
 
 		//get the closest object in that direction
-        Rigidbody target = GetNearestTarget();
+        GameObject target = GetNearestTarget();
 
-        if(target != null)
+        if(target != null && target.GetComponent<Rigidbody>() != null)
         {
             //add force to fist, towards the targeted object
-            target.velocity += direction.normalized * punchForce;
+            target.GetComponent<Rigidbody>().velocity += direction.normalized * punchForce;
             audioSource.PlayOneShot(punchAudio);
-            Debug.Log(string.Format("{0} arm punch!", arm));
+            Debug.Log(string.Format("Punch!"));
         }
 	}
 
-    private Rigidbody GetNearestTarget()
+    private GameObject GetNearestTarget()
     {
-        Rigidbody target = null;
+        GameObject target = null;
         var bumper = transform.Find("radarlol").GetComponent<SphereCollider>();
         Collider[] collider = Physics.OverlapSphere(bumper.transform.position, bumper.radius);
 
@@ -134,7 +161,7 @@ public class PlayerController : MonoBehaviour {
             var rigidbody = collision.attachedRigidbody;
             if(rigidbody != null && rigidbody.useGravity && rigidbody.name != this.name)
             {
-                target = collision.attachedRigidbody;
+                target = collision.gameObject;
             }
         }
         return target;
