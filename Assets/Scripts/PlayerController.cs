@@ -5,7 +5,9 @@ public class PlayerController : MonoBehaviour {
 
     //player positions
 	public float speed, jumpspeed, punchForce, throwForce;
-    private bool grounded;
+    public int baseDamage;
+    public int health, armor, weaponDamage;
+    private bool grounded, carryingEquipment;
     private GameObject grabbedObject;
 
     AudioClip punchAudio;
@@ -19,7 +21,7 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	// Use this for initialization
-	void Start()
+	private void Start()
 	{
         audioSource = GetComponent<AudioSource>();
         punchAudio = Resources.Load<AudioClip>("punch_heavy_stereo");
@@ -27,14 +29,14 @@ public class PlayerController : MonoBehaviour {
     }
 	
     //update stuff that shouldn't be synced to fps, like controls, here...
-	void Update()
+	private void Update()
 	{
         HandleActions();
         HandleMovement();
     }
 
     //...and physics and such here
-    void FixedUpdate()
+    private void FixedUpdate()
     {
         grounded = IsGrounded();
 
@@ -45,17 +47,9 @@ public class PlayerController : MonoBehaviour {
         rigidbody.drag = !grounded ? 0 : 10;
     }
 
-    //check the distance from collider bounds to ground below
-    //to see if we're grounded or in mid flight for some reason
-    bool IsGrounded()
-    {
-        Collider collider = GetComponent<Collider>();
-        float distance = collider.bounds.extents.y;
+    #region Update loop utilities
 
-        return Physics.Raycast(transform.position, -Vector3.up, distance + 0.0f);
-    }
-
-    void HandleMovement()
+    private void HandleMovement()
     {
         Rigidbody rigidbody = GetComponent<Rigidbody>();
 
@@ -83,7 +77,7 @@ public class PlayerController : MonoBehaviour {
             audioSource.PlayOneShot(footstepsAudio);
     }
 
-    void HandleActions()
+    private void HandleActions()
     {
         //disable when in flight, no doublejumping allowed here
         if (Input.GetButtonDown("Jump") && grounded)
@@ -99,38 +93,52 @@ public class PlayerController : MonoBehaviour {
 
     }
 
-    void Throw()
+    #endregion
+
+    #region Actions
+
+    private void Throw()
     {
         if(grabbedObject != null)
         {
             Debug.Log("Throw!");
+            RemovePowerups();
             grabbedObject.GetComponent<Rigidbody>().velocity += (transform.forward + (transform.up * 1.5f)) * throwForce;
             grabbedObject = null;
         }
     }
 
-	void Grab()
+	private void Grab()
 	{
         //get the closest player/item/thing
         GameObject target = GetNearestTarget();
+
+        if (target == null) return; //nothing to grab
+
         if (grabbedObject == null)
         {
             Debug.Log("Grab!");
             //grab it!
             grabbedObject = target;
+
+            if (!carryingEquipment)
+            {
+                AddPowerups();
+                carryingEquipment = true;
+            }
         }
         else
         {
             Debug.Log("Drop!");
             //let go of the object
+            RemovePowerups();
+            carryingEquipment = false;
             grabbedObject = null;
         }
 	}
 
-	void Punch()
+	private void Punch()
 	{
-
-		//get the fist subcomponent of the selected arm
 		//get the direction the player is facing
         var direction = transform.forward;
 
@@ -145,6 +153,40 @@ public class PlayerController : MonoBehaviour {
             Debug.Log(string.Format("Punch!"));
         }
 	}
+
+    private void Use()
+    {
+        var stats = grabbedObject.GetComponent<ItemController>();
+        if (stats == null || !stats.equippable) return; //doesn't have powerups
+
+        if (!stats.used)
+        {
+            if (stats.healthOnUse > 0) this.health += stats.healthOnUse;
+            if (stats.armorOnUse > 0) this.armor += stats.armorOnUse;
+
+            stats.used = true;
+
+            Debug.Log("Used item: +" + stats.healthOnUse + "health, +" + stats.armorOnUse + " armor");
+        }
+        else
+        {
+            Debug.Log("Item has no charges left");
+        }
+    }
+
+    #endregion
+
+    #region Action utilities
+
+    //check the distance from collider bounds to ground below
+    //to see if we're grounded or in mid flight for some reason
+    private bool IsGrounded()
+    {
+        Collider collider = GetComponent<Collider>();
+        float distance = collider.bounds.extents.y;
+
+        return Physics.Raycast(transform.position, -Vector3.up, distance + 0.0f);
+    }
 
     private GameObject GetNearestTarget()
     {
@@ -166,4 +208,21 @@ public class PlayerController : MonoBehaviour {
         }
         return target;
     }
+
+    private void AddPowerups()
+    {
+        var stats = grabbedObject.GetComponent<ItemController>();
+        if (stats == null || !stats.equippable) return; //doesn't have powerups
+
+        if (stats.damagePowerup > 0) this.weaponDamage = stats.damagePowerup;
+        if (stats.armorPowerup > 0) this.armor = stats.armorPowerup;
+    }
+
+    private void RemovePowerups()
+    {
+        this.weaponDamage = 0;
+        this.armor = 0;
+    }
+
+    #endregion
 }

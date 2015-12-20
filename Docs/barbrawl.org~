@@ -1,8 +1,9 @@
 Barbrawl
 
 * Yleistä
-** DONE Git repo
+** Git repo
 ** Visuaalinen ilme
+** 
 
 * MVP
   Tavoitteena lähinnä ladata skene, pelaaja ja hakata/heitellä esineitä pelaajalla
@@ -10,13 +11,13 @@ Barbrawl
 
 ** Core
 *** TODO Kenttien lataus
-*** DONE Pelaaja
+*** TODO Pelaaja
 *** TODO Dummyhahmo kakkospelaajaks
    
 ** Pelimekaniikat
-*** DONE liikkuminen
-*** DONE lyönti
-*** DONE grab
+*** TODO liikkuminen
+*** TODO lyönti
+*** TODO grab
 
 ** Assetit
 *** TODO Hahmo & skeletorointi
@@ -51,4 +52,3 @@ Barbrawl
 
 ** Assetit
 *** ympäristöt omilla kikoillaan, esim keinuva laivabaari
-    
