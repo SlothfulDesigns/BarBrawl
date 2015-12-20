@@ -35,14 +35,17 @@ public class ItemController : MonoBehaviour {
 
         audioSource = GetComponent<AudioSource>();
 
-        if(!string.IsNullOrEmpty(onUseAudioFxFilename))
-            onUseAudioFx = Resources.Load<AudioClip>(onUseAudioFxFilename);
+        if (audioSource != null)
+        {
+            if (!string.IsNullOrEmpty(onUseAudioFxFilename))
+                onUseAudioFx = Resources.Load<AudioClip>(onUseAudioFxFilename);
 
-        if(!string.IsNullOrEmpty(onHitAudioFxFilename))
-            onHitAudioFx = Resources.Load<AudioClip>(onHitAudioFxFilename);
+            if (!string.IsNullOrEmpty(onHitAudioFxFilename))
+                onHitAudioFx = Resources.Load<AudioClip>(onHitAudioFxFilename);
 
-        if(!string.IsNullOrEmpty(onBreakAudioFxFilename))
-            onBreakAudioFx = Resources.Load<AudioClip>(onBreakAudioFxFilename);
+            if (!string.IsNullOrEmpty(onBreakAudioFxFilename))
+                onBreakAudioFx = Resources.Load<AudioClip>(onBreakAudioFxFilename);
+        }
     }
 
     private void Update()
@@ -78,6 +81,10 @@ public class ItemController : MonoBehaviour {
             for(int i = 0; i < parts.Length; i++)
             {
                 parts[i].transform.parent = null;
+                parts[i].isKinematic = false;
+                parts[i].velocity += Vector3.forward / parts[i].mass;
+
+                //TODO: figure out how to make the parts equippable
             }
         }
         this.dead = true;
@@ -86,7 +93,7 @@ public class ItemController : MonoBehaviour {
 
     public void TriggerSoundEffect(ItemSoundFx effect)
     {
-        if (audioSource.isPlaying) return;
+        if (audioSource == null || audioSource.isPlaying) return;
 
         switch (effect) {
             case ItemSoundFx.Use:

@@ -113,8 +113,11 @@ public class PlayerController : MonoBehaviour {
 	{
         //get the closest player/item/thing
         GameObject target = GetNearestTarget();
+        if (target == null) return; //move along, nothing to grab here
 
-        if (target == null) return; //nothing to grab
+        ItemController itemController = target.GetComponentInParent<ItemController>();
+        //carry on if this is an item that can't be equipped
+        if (itemController != null && !itemController.equippable) return;
 
         if (grabbedObject == null)
         {
@@ -140,12 +143,14 @@ public class PlayerController : MonoBehaviour {
 		//get the closest object in that direction
         GameObject target = GetNearestTarget();
 
-        if(target != null && target.GetComponent<Rigidbody>() != null)
+        if(target != null)
         {
             //add force to fist, towards the targeted object
-            target.GetComponent<Rigidbody>().velocity += direction.normalized * punchForce;
-            ItemController itemController = target.GetComponent<ItemController>();
+            Rigidbody rigidbody = target.GetComponent<Rigidbody>();
+            if(rigidbody != null)
+                rigidbody.velocity += direction.normalized * punchForce;
 
+            ItemController itemController = target.GetComponentInParent<ItemController>();
             if(itemController != null && !itemController.invulnerable)
             {
                 itemController.Damage(this.baseDamage + this.weaponDamage);
