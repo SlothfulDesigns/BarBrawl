@@ -26,15 +26,15 @@ Barbrawl
 
 * V1
 ** Core
-*** Multiplayer eli pelaajat 2, 3 ja 4
-*** Voittohommat
+*** TODO Multiplayer eli pelaajat 2, 3 ja 4
+*** TODO Voittohommat
 
 ** Pelimekaniikat
-*** Powerupit, esim gräbättyjen pullojen juominen
+*** DONE Powerupit, esim gräbättyjen pullojen juominen
 
 ** Assetit
-*** Hahmoanimaatiot
-*** Lisää assetteja ja ympäristöjä
+*** TODO Hahmoanimaatiot
+*** TODO Lisää assetteja ja ympäristöjä
 
    
 * Future

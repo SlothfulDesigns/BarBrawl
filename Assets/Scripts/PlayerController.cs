@@ -7,7 +7,7 @@ public class PlayerController : MonoBehaviour {
 	public float speed, jumpspeed, punchForce, throwForce;
     public int baseDamage;
     public int health, armor, weaponDamage;
-    private bool grounded, carryingEquipment;
+    private bool grounded;
     private GameObject grabbedObject;
 
     AudioClip punchAudio;
@@ -90,6 +90,7 @@ public class PlayerController : MonoBehaviour {
         if (Input.GetButtonDown("Punch")) Punch();
         if (Input.GetButtonDown("Grab")) Grab();
         if (Input.GetButtonDown("Throw")) Throw();
+        if (Input.GetButtonDown("Use")) Use();
 
     }
 
@@ -120,19 +121,13 @@ public class PlayerController : MonoBehaviour {
             Debug.Log("Grab!");
             //grab it!
             grabbedObject = target;
-
-            if (!carryingEquipment)
-            {
-                AddPowerups();
-                carryingEquipment = true;
-            }
+            AddPowerups();
         }
         else
         {
             Debug.Log("Drop!");
             //let go of the object
             RemovePowerups();
-            carryingEquipment = false;
             grabbedObject = null;
         }
 	}
@@ -149,6 +144,14 @@ public class PlayerController : MonoBehaviour {
         {
             //add force to fist, towards the targeted object
             target.GetComponent<Rigidbody>().velocity += direction.normalized * punchForce;
+            ItemController itemController = target.GetComponent<ItemController>();
+
+            if(itemController != null && !itemController.invulnerable)
+            {
+                itemController.Damage(this.baseDamage + this.weaponDamage);
+                Debug.Log(this.name + " hit " + target.name);
+            }
+
             audioSource.PlayOneShot(punchAudio);
             Debug.Log(string.Format("Punch!"));
         }
@@ -156,6 +159,9 @@ public class PlayerController : MonoBehaviour {
 
     private void Use()
     {
+
+        if (grabbedObject == null) return;
+
         var stats = grabbedObject.GetComponent<ItemController>();
         if (stats == null || !stats.equippable) return; //doesn't have powerups
 
@@ -163,6 +169,8 @@ public class PlayerController : MonoBehaviour {
         {
             if (stats.healthOnUse > 0) this.health += stats.healthOnUse;
             if (stats.armorOnUse > 0) this.armor += stats.armorOnUse;
+
+            stats.TriggerSoundEffect(ItemController.ItemSoundFx.Use);
 
             stats.used = true;
 
